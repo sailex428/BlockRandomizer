@@ -1,4 +1,4 @@
 name: BlockRandomizer
 version: '${project.version}'
-main: me.sailex.blockrandomizer.BlockRandomizer
+main: me.sailex.blockrandomizer.Main
 api-version: '1.20'
