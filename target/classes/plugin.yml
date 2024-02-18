@@ -1,0 +1,12 @@
+name: BlockRandomizer
+version: '0.0.3'
+main: me.sailex.blockrandomizer.Main
+api-version: '1.20'
+
+commands:
+  randomizer:
+    permission: Randomizer.start
+
+permissions:
+  Randomizer.start:
+    default: op
