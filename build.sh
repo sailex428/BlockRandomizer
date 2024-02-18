@@ -1,0 +1,1 @@
+mv target/BlockRandomizer-0.0.3.jar  /Users/Elias/minecraft/BuildToolsTestServer/plugins/

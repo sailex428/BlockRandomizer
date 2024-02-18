@@ -1,8 +1,14 @@
 package me.sailex.blockrandomizer;
 
+import me.sailex.blockrandomizer.command.RandomizerGuiCommand;
+import me.sailex.blockrandomizer.gui.RandomizerGUI;
 import me.sailex.blockrandomizer.listener.BlockBreakListener;
+import me.sailex.blockrandomizer.listener.InventoryClickListener;
 import me.sailex.blockrandomizer.listener.InventoryOpenListener;
-import org.bukkit.Material;
+import me.sailex.blockrandomizer.manager.MaterialsManager;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -12,23 +18,27 @@ public final class Main extends JavaPlugin implements Listener {
 
     private static Main instance;
     private MaterialsManager materialsManager;
-    private final List<Material> nonSurvivalMaterials = Arrays.asList(
-            Material.COMMAND_BLOCK, Material.BARRIER, Material.STRUCTURE_VOID,
-            Material.LIGHT, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK,
-            Material.STRUCTURE_BLOCK, Material.JIGSAW, Material.PETRIFIED_OAK_SLAB, Material.PLAYER_HEAD,
-            Material.KNOWLEDGE_BOOK, Material.DEBUG_STICK, Material.BEDROCK,
-            Material.REINFORCED_DEEPSLATE, Material.CHORUS_PLANT, Material.BUDDING_AMETHYST,
-            Material.END_PORTAL_FRAME, Material.COMMAND_BLOCK_MINECART, Material.INFESTED_COBBLESTONE,
-            Material.INFESTED_CHISELED_STONE_BRICKS, Material.INFESTED_STONE_BRICKS, Material.INFESTED_MOSSY_STONE_BRICKS,
-            Material.INFESTED_CRACKED_STONE_BRICKS, Material.INFESTED_DEEPSLATE, Material.INFESTED_STONE
-    );
+    private RandomizerGUI randomizerGUI;
+
     @Override
     public void onEnable() {
         instance = this;
-        materialsManager = new MaterialsManager(nonSurvivalMaterials);
-        getServer().getPluginManager().registerEvents(new InventoryOpenListener(), this);
-        getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
+        List<String> nonSurvivalMaterials = (List<String>) this.getConfig().getList("nonSurvivalMaterials");
+        if (nonSurvivalMaterials != null) {
+            materialsManager = new MaterialsManager(nonSurvivalMaterials);
+            randomizerGUI = new RandomizerGUI();
+            getServer().getPluginManager().registerEvents(new InventoryOpenListener(), this);
+            getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
+            getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
+        } else {
+            Bukkit.broadcastMessage("§cNo exclusionlist of material found!");
+        }
+        Objects.requireNonNull(getCommand("randomizer")).setExecutor(new RandomizerGuiCommand());
+    }
 
+    @Override
+    public void onDisable() {
+        materialsManager.setBlockToDropMapConfig();
     }
 
     public static Main getInstance() {
@@ -37,6 +47,10 @@ public final class Main extends JavaPlugin implements Listener {
 
     public MaterialsManager getMaterialsManager() {
         return materialsManager;
+    }
+
+    public RandomizerGUI getRandomizerGUI() {
+        return randomizerGUI;
     }
 
 }
