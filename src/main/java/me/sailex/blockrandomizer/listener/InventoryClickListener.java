@@ -1,7 +1,8 @@
 package me.sailex.blockrandomizer.listener;
 
-import me.sailex.blockrandomizer.Main;
-import me.sailex.blockrandomizer.manager.MaterialsManager;
+import me.sailex.blockrandomizer.BlockRandomizer;
+import me.sailex.blockrandomizer.materials.MaterialsManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,61 +10,60 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
-
 public class InventoryClickListener implements Listener {
+
+    private final BlockRandomizer blockRandomizer;
+
+    public InventoryClickListener(BlockRandomizer blockRandomizer) {
+        this.blockRandomizer = blockRandomizer;
+    }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
 
-        if (event.getClickedInventory() == Main.getInstance().getRandomizerGUI().getInv()) {
+        if (event.getClickedInventory() != this.blockRandomizer.getRandomizerGUI().getInv()) {
+            return;
+        }
+        event.setCancelled(true);
+        ItemStack currentItem = event.getCurrentItem();
+        MaterialsManager manager = this.blockRandomizer.getMaterialsManager();
+        Player player = (Player) event.getWhoClicked();
 
-            if (event.getWhoClicked() instanceof Player) {
+        if (currentItem == null) {
+            return;
+        }
 
-                event.setCancelled(true);
-                ItemStack currentItem = event.getCurrentItem();
-                MaterialsManager manager = Main.getInstance().getMaterialsManager();
-                Player player = (Player) event.getWhoClicked();
-
-                if (currentItem != null) {
-
-                    if (currentItem.getType() == Material.GREEN_WOOL) {
-                        manager.setIsRandomizerActive(!manager.getIsRandomizerActive());
-                        if (manager.getIsRandomizerActive()) {
-                            player.sendMessage("§aRandomizer has been activated!");
-                        } else {
-                            player.sendMessage("§cRandomizer has been disabled!");
-                        }
-                    }
-
-                    if (currentItem.getType() == Material.COMMAND_BLOCK) {
-                        if (manager.loadBlockToDropMap()) {
-                            player.sendMessage("§aRandomizer configuration of last played challenge has been loaded!");
-                        } else {
-                            player.sendMessage("§cNo configuration found!");
-                        }
-                    }
-
-                    if (currentItem.getType() == Material.RED_WOOL) {
-                        Bukkit.getOnlinePlayers().forEach(p -> p.kickPlayer( "§aWorld reset"));
-                        try {
-                            String[] worlds = {"world", "world_nether", "world_the_end"};
-                            for (String world : worlds) {
-                                File dimension = new File(Bukkit.getWorldContainer(), world);
-                                Files.walk(dimension.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-                            }
-
-                        } catch (IOException e) {
-                            System.out.println("§ferror by resetting world!");
-                        }
-                        Bukkit.spigot().restart();
-                    }
-                }
+        if (currentItem.getType().equals(Material.GRASS_BLOCK)) {
+            manager.setIsBlockRandomizerActive(!manager.getIsBlockRandomizerActive());
+            if (manager.getIsBlockRandomizerActive()) {
+                player.sendMessage("§aBlock Randomizer has been activated!");
+            } else {
+                player.sendMessage("§cBlock Randomizer has been disabled!");
             }
+        }
+
+        if (currentItem.getType().equals(Material.CHEST)) {
+            manager.setIsChestRandomizerActive(!manager.getIsChestRandomizerActive());
+            if (manager.getIsChestRandomizerActive()) {
+                player.sendMessage("§aChest Randomizer has been activated!");
+            } else {
+                player.sendMessage("§cChest Randomizer has been disabled!");
+            }
+        }
+
+        if (currentItem.getType().equals(Material.COMMAND_BLOCK)) {
+            if (manager.loadBlockToDropMap()) {
+                player.sendMessage("§aConfiguration has been loaded!");
+            } else {
+                player.sendMessage("§cNo configuration found!");
+            }
+        }
+
+        if (currentItem.getType() == Material.HEART_OF_THE_SEA) {
+            Bukkit.getOnlinePlayers().forEach(p -> p.kick(Component.text("§aWorld resetting")));
+            blockRandomizer.getConfig().set("DELETE_WORLDS_ON_RESTART", true);
+            blockRandomizer.saveConfig();
+            Bukkit.spigot().restart();
         }
     }
 }
