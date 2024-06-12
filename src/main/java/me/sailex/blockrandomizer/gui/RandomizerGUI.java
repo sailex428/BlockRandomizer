@@ -29,7 +29,7 @@ public class RandomizerGUI implements Listener {
     private void initializeItems() {
         contents[0] = createGuiItem(Material.GRASS_BLOCK, "§aToggle Block Randomizer", "§fBlockdrop will be/not be randomized.");
         contents[1] = createGuiItem(Material.CHEST, "§aToggle Chest Randomizer", "§fChestcontent will be/not be randomized.");
-        contents[4] = createGuiItem(Material.COMMAND_BLOCK, "§dLoad saved Randomizer config", "§fLoads randomizer scheme of the last game played.");
+        contents[7] = createGuiItem(Material.COMMAND_BLOCK, "§dLoad saved Randomizer config", "§fLoads randomizer scheme of the last game played.");
         contents[8] = createGuiItem(Material.HEART_OF_THE_SEA, "§cNew world", "§fDeletes current world and creates new world");
     }
 
