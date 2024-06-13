@@ -45,21 +45,10 @@ public class InventoryOpenListener implements Listener {
 
         Inventory chestInventory = event.getInventory();
 
-        String META_KEY = "randomized";
-
-        if (chestInventory.getHolder() instanceof Chest) {
-            Chest chest = (Chest) chestInventory.getHolder();
-            if (!chest.hasMetadata(META_KEY)) {
-                chest.setMetadata(META_KEY, new FixedMetadataValue(blockRandomizer, true));
-            }
-        } if (chestInventory.getHolder() instanceof StorageMinecart) {
-            StorageMinecart minecart = (StorageMinecart) chestInventory.getHolder();
-            if (!minecart.hasMetadata(META_KEY)) {
-                minecart.setMetadata(META_KEY, new FixedMetadataValue(blockRandomizer, true));
-            }
-        } else {
+        if (putMetaIfAbsent(chestInventory)) {
             return;
         }
+
         randomizeChestLoot(chestInventory);
     }
 
@@ -81,6 +70,28 @@ public class InventoryOpenListener implements Listener {
         }
         chestInventory.clear();
         chestInventory.setContents(contents);
+    }
+
+    private boolean putMetaIfAbsent(Inventory chestInventory) {
+        String META_KEY = "randomized";
+
+        if (chestInventory.getHolder() instanceof Chest) {
+            Chest chest = (Chest) chestInventory.getHolder();
+            if (!chest.hasMetadata(META_KEY)) {
+                chest.setMetadata(META_KEY, new FixedMetadataValue(blockRandomizer, true));
+                return false;
+            }
+        }
+
+        if (chestInventory.getHolder() instanceof StorageMinecart) {
+            StorageMinecart minecart = (StorageMinecart) chestInventory.getHolder();
+            if (!minecart.hasMetadata(META_KEY)) {
+                minecart.setMetadata(META_KEY, new FixedMetadataValue(blockRandomizer, true));
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }
