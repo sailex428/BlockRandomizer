@@ -8,11 +8,11 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class RandomizerGuiCommand implements CommandExecutor {
+public class RandomizerInvCommand implements CommandExecutor {
 
     private final BlockRandomizer blockRandomizer;
 
-    public RandomizerGuiCommand(BlockRandomizer blockRandomizer) {
+    public RandomizerInvCommand(BlockRandomizer blockRandomizer) {
         this.blockRandomizer = blockRandomizer;
     }
 
@@ -25,7 +25,7 @@ public class RandomizerGuiCommand implements CommandExecutor {
                 return false;
             }
 
-            blockRandomizer.getRandomizerGUI().openGUI((HumanEntity) sender);
+            blockRandomizer.getRandomizerInv().openInv((HumanEntity) sender);
             return true;
 
         }
