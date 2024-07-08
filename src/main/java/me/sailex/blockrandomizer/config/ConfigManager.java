@@ -75,7 +75,8 @@ public class ConfigManager {
 
     public boolean loadConfigMap(Map<String, String> stringMap, String mapConfigPath) {
         ConfigurationSection section = config.getConfigurationSection(mapConfigPath);
-        if (!checkConfigSection(section)) {
+        if (section == null) {
+            LOGGER.error("Failed to load {}", mapConfigPath);
             return false;
         }
         stringMap.clear();
@@ -83,12 +84,6 @@ public class ConfigManager {
             stringMap.put(key, (String) section.getValues(false).get(key));
         }
         return true;
-    }
-
-    private boolean checkConfigSection(ConfigurationSection section) {
-        return section != null &&
-                !section.getKeys(false).isEmpty() &&
-                !section.getValues(false).isEmpty();
     }
 
     public void setBlockToDropMapConfig(Map<String, String> blockToDropMap) {

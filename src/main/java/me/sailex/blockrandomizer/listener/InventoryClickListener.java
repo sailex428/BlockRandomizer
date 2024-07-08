@@ -20,10 +20,10 @@ public class InventoryClickListener implements Listener {
     private final MaterialsManager materialsManager;
     private final RandomizerInventory randomizerInventory;
 
-    public InventoryClickListener(BlockRandomizer blockRandomizer, ConfigManager configManager) {
-        this.configManager = configManager;
+    public InventoryClickListener(BlockRandomizer blockRandomizer) {
         this.materialsManager = blockRandomizer.getMaterialsManager();
         this.randomizerInventory = blockRandomizer.getRandomizerInv();
+        this.configManager = blockRandomizer.getConfigManager();
     }
 
     @EventHandler

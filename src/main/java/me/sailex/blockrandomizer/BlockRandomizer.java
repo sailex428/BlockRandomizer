@@ -8,6 +8,7 @@ import me.sailex.blockrandomizer.listener.InventoryClickListener;
 import me.sailex.blockrandomizer.listener.InventoryOpenListener;
 import me.sailex.blockrandomizer.materials.MaterialsManager;
 
+import me.sailex.blockrandomizer.materials.Randomizer;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,6 +19,7 @@ public final class BlockRandomizer extends JavaPlugin implements Listener {
     private MaterialsManager materialsManager;
     private RandomizerInventory randomizerInventory;
     private ConfigManager configManager;
+    private Randomizer randomizer;
 
     @Override
     public void onLoad() {
@@ -30,6 +32,7 @@ public final class BlockRandomizer extends JavaPlugin implements Listener {
     public void onEnable() {
         materialsManager = new MaterialsManager(configManager);
         randomizerInventory = new RandomizerInventory(materialsManager);
+        randomizer = new Randomizer(this);
 
         registerCommands();
         registerListener();
@@ -42,8 +45,8 @@ public final class BlockRandomizer extends JavaPlugin implements Listener {
 
     private void registerListener() {
         getServer().getPluginManager().registerEvents(new InventoryOpenListener(this), this);
-        getServer().getPluginManager().registerEvents(new BlockBreakListener(materialsManager), this);
-        getServer().getPluginManager().registerEvents(new InventoryClickListener(this, configManager), this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
+        getServer().getPluginManager().registerEvents(new InventoryClickListener(this), this);
     }
 
     private void registerCommands() {
@@ -56,6 +59,14 @@ public final class BlockRandomizer extends JavaPlugin implements Listener {
 
     public MaterialsManager getMaterialsManager() {
         return materialsManager;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public Randomizer getRandomizer() {
+        return randomizer;
     }
 
 }

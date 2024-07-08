@@ -19,6 +19,7 @@ public class RandomizerInventory implements Listener {
     private final Inventory inv;
     private final ItemStack[] contents = new ItemStack[9];
     private final MaterialsManager materialsManager;
+
     private static final String ON =  "§aON";
     private static final String OFF = "§cOFF";
 
@@ -43,7 +44,7 @@ public class RandomizerInventory implements Listener {
                 "§c- Deletes the current Randomizer");
 
         contents[8] = createInvItem(Material.HEART_OF_THE_SEA, "§dCreate new World",
-                "§c- Deletes current World");
+                "§c- Deletes the current World");
         inv.setContents(contents);
     }
 

@@ -10,12 +10,10 @@ public class MaterialsManager {
 
     private final List<String> excludedMaterials;
     private final List<Material> registeredMaterials = new ArrayList<>();
-    private Map<String, String> blockToDropMap = new HashMap<>();
+    private final Map<String, String> blockToDropMap = new HashMap<>();
 
     private boolean isBlockRandomizerActive = true;
     private boolean isChestRandomizerActive = true;
-
-    private final Random random = new Random();
 
     public MaterialsManager(ConfigManager configManager) {
         this.excludedMaterials = configManager.loadExcludedMaterials();
@@ -31,17 +29,6 @@ public class MaterialsManager {
         }
     }
 
-    public Material getRandomizedBlockDrop(Material blockType) {
-        Material drop;
-        if (blockToDropMap.containsKey(blockType.name())) {
-            drop = Material.valueOf(blockToDropMap.get(blockType.name()));
-        } else {
-            drop = registeredMaterials.get(random.nextInt(registeredMaterials.size()));
-            blockToDropMap.put(blockType.name(), drop.name());
-        }
-        return drop;
-    }
-
     public void resetBlockToDropMap() {
         blockToDropMap.clear();
     }
@@ -52,10 +39,6 @@ public class MaterialsManager {
 
     public Map<String, String> getBlockToDropMap() {
         return blockToDropMap;
-    }
-
-    public void setBlockToDropMap(Map<String, String> blockToDropMap) {
-        this.blockToDropMap = blockToDropMap;
     }
 
     public boolean getIsBlockRandomizerActive() {

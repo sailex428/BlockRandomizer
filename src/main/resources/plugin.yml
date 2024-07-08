@@ -1,5 +1,5 @@
 name: BlockRandomizer
-version: '0.0.2'
+version: '${version}'
 main: me.sailex.blockrandomizer.BlockRandomizer
 api-version: '1.20'
 authors: [sailex]
