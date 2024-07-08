@@ -2,6 +2,7 @@ package me.sailex.blockrandomizer.config;
 
 import me.sailex.blockrandomizer.BlockRandomizer;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -42,6 +43,11 @@ public class ConfigManager {
         }
         deleteAllWorlds();
         config.set(DELETE_WORLDS_ON_RESTART, false);
+        blockRandomizer.saveConfig();
+    }
+
+    public void setDeleteWorldsConfig(boolean deleteWorldsOnRestart) {
+        config.set(DELETE_WORLDS_ON_RESTART, deleteWorldsOnRestart);
         blockRandomizer.saveConfig();
     }
 

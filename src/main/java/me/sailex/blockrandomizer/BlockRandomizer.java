@@ -29,7 +29,7 @@ public final class BlockRandomizer extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         materialsManager = new MaterialsManager(configManager);
-        randomizerInventory = new RandomizerInventory();
+        randomizerInventory = new RandomizerInventory(materialsManager);
 
         registerCommands();
         registerListener();
@@ -42,8 +42,8 @@ public final class BlockRandomizer extends JavaPlugin implements Listener {
 
     private void registerListener() {
         getServer().getPluginManager().registerEvents(new InventoryOpenListener(this), this);
-        getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
-        getServer().getPluginManager().registerEvents(new InventoryClickListener(this), this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(materialsManager), this);
+        getServer().getPluginManager().registerEvents(new InventoryClickListener(this, configManager), this);
     }
 
     private void registerCommands() {

@@ -1,6 +1,8 @@
 package me.sailex.blockrandomizer.listener;
 
 import me.sailex.blockrandomizer.BlockRandomizer;
+import me.sailex.blockrandomizer.config.ConfigManager;
+import me.sailex.blockrandomizer.gui.RandomizerInventory;
 import me.sailex.blockrandomizer.materials.MaterialsManager;
 
 import net.kyori.adventure.text.Component;
@@ -14,58 +16,65 @@ import org.bukkit.inventory.ItemStack;
 
 public class InventoryClickListener implements Listener {
 
-    private final BlockRandomizer blockRandomizer;
+    private final ConfigManager configManager;
+    private final MaterialsManager materialsManager;
+    private final RandomizerInventory randomizerInventory;
 
-    public InventoryClickListener(BlockRandomizer blockRandomizer) {
-        this.blockRandomizer = blockRandomizer;
+    public InventoryClickListener(BlockRandomizer blockRandomizer, ConfigManager configManager) {
+        this.configManager = configManager;
+        this.materialsManager = blockRandomizer.getMaterialsManager();
+        this.randomizerInventory = blockRandomizer.getRandomizerInv();
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-
-        if (event.getClickedInventory() != this.blockRandomizer.getRandomizerInv().getInv()) {
+        if (event.getClickedInventory() != randomizerInventory.getInv()) {
             return;
         }
         event.setCancelled(true);
         ItemStack currentItem = event.getCurrentItem();
-        MaterialsManager manager = this.blockRandomizer.getMaterialsManager();
         Player player = (Player) event.getWhoClicked();
 
         if (currentItem == null) {
             return;
         }
 
-        if (currentItem.getType().equals(Material.GRASS_BLOCK)) {
-            manager.setIsBlockRandomizerActive(!manager.getIsBlockRandomizerActive());
-            if (manager.getIsBlockRandomizerActive()) {
-                player.sendMessage("§aBlock Randomizer has been activated!");
-            } else {
-                player.sendMessage("§cBlock Randomizer has been disabled!");
-            }
-        }
+        handleBlockRandomizer(currentItem);
+        handleChestRandomizer(currentItem);
+        handleLoadConfig(currentItem, player);
+        handleWorldReset(currentItem);
+    }
 
-        if (currentItem.getType().equals(Material.CHEST)) {
-            manager.setIsChestRandomizerActive(!manager.getIsChestRandomizerActive());
-            if (manager.getIsChestRandomizerActive()) {
-                player.sendMessage("§aChest Randomizer has been activated!");
-            } else {
-                player.sendMessage("§cChest Randomizer has been disabled!");
-            }
+    private void handleBlockRandomizer(ItemStack currentItem) {
+        if (!currentItem.getType().equals(Material.GRASS_BLOCK)) {
+            return;
         }
+        materialsManager.setIsBlockRandomizerActive(!materialsManager.getIsBlockRandomizerActive());
+        randomizerInventory.initializeItems();
+    }
 
-        if (currentItem.getType().equals(Material.COMMAND_BLOCK)) {
-            if (manager.loadBlockToDropMap()) {
-                player.sendMessage("§aConfiguration has been loaded!");
-            } else {
-                player.sendMessage("§cNo configuration found!");
-            }
+    private void handleChestRandomizer(ItemStack currentItem) {
+        if (!currentItem.getType().equals(Material.CHEST)) {
+            return;
         }
+        materialsManager.setIsChestRandomizerActive(!materialsManager.getIsChestRandomizerActive());
+        randomizerInventory.initializeItems();
+    }
 
-        if (currentItem.getType() == Material.HEART_OF_THE_SEA) {
-            Bukkit.getOnlinePlayers().forEach(p -> p.kick(Component.text("§aWorld resetting")));
-            blockRandomizer.getConfig().set("DELETE_WORLDS_ON_RESTART", true);
-            blockRandomizer.saveConfig();
-            Bukkit.spigot().restart();
+    private void handleLoadConfig(ItemStack currentItem, Player player) {
+        if (!currentItem.getType().equals(Material.COMMAND_BLOCK)) {
+            return;
         }
+        materialsManager.resetBlockToDropMap();
+        player.sendMessage("§aA new Randomizer was created!");
+    }
+
+    private void handleWorldReset(ItemStack currentItem) {
+        if (!currentItem.getType().equals(Material.HEART_OF_THE_SEA)) {
+            return;
+        }
+        Bukkit.getOnlinePlayers().forEach(p -> p.kick(Component.text("§aA new World will be created.")));
+        configManager.setDeleteWorldsConfig(true);
+        Bukkit.spigot().restart();
     }
 }

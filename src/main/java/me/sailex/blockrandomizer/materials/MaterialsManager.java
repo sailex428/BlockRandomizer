@@ -8,8 +8,6 @@ import java.util.*;
 
 public class MaterialsManager {
 
-    private final ConfigManager configManager;
-
     private final List<String> excludedMaterials;
     private final List<Material> registeredMaterials = new ArrayList<>();
     private Map<String, String> blockToDropMap = new HashMap<>();
@@ -17,9 +15,11 @@ public class MaterialsManager {
     private boolean isBlockRandomizerActive = true;
     private boolean isChestRandomizerActive = true;
 
+    private final Random random = new Random();
+
     public MaterialsManager(ConfigManager configManager) {
         this.excludedMaterials = configManager.loadExcludedMaterials();
-        this.configManager = configManager;
+        configManager.loadConfigMap(blockToDropMap, ConfigPaths.BLOCK_DROP_MAP);
         registerMaterials();
     }
 
@@ -31,8 +31,19 @@ public class MaterialsManager {
         }
     }
 
-    public boolean loadBlockToDropMap() {
-        return configManager.loadConfigMap(blockToDropMap, ConfigPaths.BLOCK_DROP_MAP);
+    public Material getRandomizedBlockDrop(Material blockType) {
+        Material drop;
+        if (blockToDropMap.containsKey(blockType.name())) {
+            drop = Material.valueOf(blockToDropMap.get(blockType.name()));
+        } else {
+            drop = registeredMaterials.get(random.nextInt(registeredMaterials.size()));
+            blockToDropMap.put(blockType.name(), drop.name());
+        }
+        return drop;
+    }
+
+    public void resetBlockToDropMap() {
+        blockToDropMap.clear();
     }
 
     public List<Material> getRegisteredMaterials() {

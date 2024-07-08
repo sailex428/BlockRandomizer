@@ -34,21 +34,16 @@ public class InventoryOpenListener implements Listener {
 
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent event) {
-
         if (!blockRandomizer.getMaterialsManager().getIsChestRandomizerActive()) {
             return;
         }
-
         if (!event.getInventory().getType().equals(InventoryType.CHEST)) {
             return;
         }
-
         Inventory chestInventory = event.getInventory();
-
         if (putMetaIfAbsent(chestInventory)) {
             return;
         }
-
         randomizeChestLoot(chestInventory);
     }
 
