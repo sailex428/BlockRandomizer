@@ -29,7 +29,7 @@ public class InventoryOpenListener implements Listener {
         this.blockRandomizer = blockRandomizer;
         materialsManager = blockRandomizer.getMaterialsManager();
         blockToDropMap = materialsManager.getBlockToDropMap();
-        materials = materialsManager.getMaterials();
+        materials = materialsManager.getRegisteredMaterials();
     }
 
     @EventHandler
@@ -75,16 +75,14 @@ public class InventoryOpenListener implements Listener {
     private boolean putMetaIfAbsent(Inventory chestInventory) {
         String META_KEY = "randomized";
 
-        if (chestInventory.getHolder() instanceof Chest) {
-            Chest chest = (Chest) chestInventory.getHolder();
+        if (chestInventory.getHolder() instanceof Chest chest) {
             if (!chest.hasMetadata(META_KEY)) {
                 chest.setMetadata(META_KEY, new FixedMetadataValue(blockRandomizer, true));
                 return false;
             }
         }
 
-        if (chestInventory.getHolder() instanceof StorageMinecart) {
-            StorageMinecart minecart = (StorageMinecart) chestInventory.getHolder();
+        if (chestInventory.getHolder() instanceof StorageMinecart minecart) {
             if (!minecart.hasMetadata(META_KEY)) {
                 minecart.setMetadata(META_KEY, new FixedMetadataValue(blockRandomizer, true));
                 return false;

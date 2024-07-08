@@ -1,73 +1,53 @@
 package me.sailex.blockrandomizer;
 
 import me.sailex.blockrandomizer.command.RandomizerInvCommand;
+import me.sailex.blockrandomizer.config.ConfigManager;
 import me.sailex.blockrandomizer.gui.RandomizerInventory;
 import me.sailex.blockrandomizer.listener.BlockBreakListener;
 import me.sailex.blockrandomizer.listener.InventoryClickListener;
 import me.sailex.blockrandomizer.listener.InventoryOpenListener;
 import me.sailex.blockrandomizer.materials.MaterialsManager;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
+
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 public final class BlockRandomizer extends JavaPlugin implements Listener {
 
     private MaterialsManager materialsManager;
     private RandomizerInventory randomizerInventory;
+    private ConfigManager configManager;
 
     @Override
     public void onLoad() {
         this.saveDefaultConfig();
-        if (getConfig().getBoolean("DELETE_WORLDS_ON_RESTART")) {
-            deleteWorlds();
-            getConfig().set("DELETE_WORLDS_ON_RESTART", false);
-            saveConfig();
-        }
+        configManager = new ConfigManager(this);
+        configManager.resetWorldsOnRestart();
     }
 
     @Override
     public void onEnable() {
-        List<String> excludedMaterials = (List<String>) this.getConfig().getList("EXCLUDED_MATERIALS");
-        if (excludedMaterials != null) {
-            materialsManager = new MaterialsManager(excludedMaterials, this);
-            randomizerInventory = new RandomizerInventory();
-            Objects.requireNonNull(getCommand("randomizer")).setExecutor(new RandomizerInvCommand(this));
-            getServer().getPluginManager().registerEvents(new InventoryOpenListener(this), this);
-            getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
-            getServer().getPluginManager().registerEvents(new InventoryClickListener(this), this);
-        } else {
-            Bukkit.broadcast(Component.text("§cNo exclusionlist of materials found!"));
-        }
+        materialsManager = new MaterialsManager(configManager);
+        randomizerInventory = new RandomizerInventory();
+
+        registerCommands();
+        registerListener();
     }
 
     @Override
     public void onDisable() {
-        materialsManager.setBlockToDropMapConfig();
+        configManager.setBlockToDropMapConfig(materialsManager.getBlockToDropMap());
     }
 
-    private void deleteWorlds() {
-        try {
-            String[] worlds = {"world", "world_nether", "world_the_end"};
-            for (String world : worlds) {
-                File dimension = new File(Bukkit.getWorldContainer(), world);
-                Files.walk(dimension.toPath()).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-                if (world.equalsIgnoreCase("world")) {
-                    new File(dimension, "playerdata").mkdirs();
-                }
-            }
-        } catch (IOException e) {
-            Bukkit.getServer().sendMessage(Component.text("§fError occurred by resetting world!"));
-        }
+    private void registerListener() {
+        getServer().getPluginManager().registerEvents(new InventoryOpenListener(this), this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
+        getServer().getPluginManager().registerEvents(new InventoryClickListener(this), this);
+    }
 
+    private void registerCommands() {
+        Objects.requireNonNull(getCommand("randomizer")).setExecutor(new RandomizerInvCommand(this));
     }
 
     public RandomizerInventory getRandomizerInv() {

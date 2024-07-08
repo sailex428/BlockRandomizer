@@ -24,7 +24,7 @@ public class BlockBreakListener implements Listener {
         this.blockRandomizer = blockRandomizer;
         materialsManager = blockRandomizer.getMaterialsManager();
         blockToDropMap = materialsManager.getBlockToDropMap();
-        materials = materialsManager.getMaterials();
+        materials = materialsManager.getRegisteredMaterials();
     }
 
     @EventHandler

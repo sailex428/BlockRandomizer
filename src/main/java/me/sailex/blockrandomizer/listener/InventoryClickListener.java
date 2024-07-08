@@ -2,7 +2,9 @@ package me.sailex.blockrandomizer.listener;
 
 import me.sailex.blockrandomizer.BlockRandomizer;
 import me.sailex.blockrandomizer.materials.MaterialsManager;
+
 import net.kyori.adventure.text.Component;
+
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +23,7 @@ public class InventoryClickListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
 
-        if (event.getClickedInventory() != this.blockRandomizer.getRandomizerGUI().getInv()) {
+        if (event.getClickedInventory() != this.blockRandomizer.getRandomizerInv().getInv()) {
             return;
         }
         event.setCancelled(true);
