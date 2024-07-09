@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: artifact-${{ github.event.number }}
-        path: 'target/BlockRandomizer*.jar'
+        path: 'build/libs/*.jar'
   
   runtime-test:
     name: Plugin Runtime Test 
