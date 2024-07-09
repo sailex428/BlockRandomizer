@@ -1,65 +1,44 @@
 package me.sailex.blockrandomizer.materials;
 
-import me.sailex.blockrandomizer.BlockRandomizer;
+import me.sailex.blockrandomizer.config.ConfigManager;
+import me.sailex.blockrandomizer.config.ConfigPaths;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.*;
 
 public class MaterialsManager {
 
-    private final BlockRandomizer blockRandomizer;
-    private final List<String> nonSurvivalMaterials;
-    private final List<Material> materials = new ArrayList<>();
-    private Map<String, String> blockToDropMap = new HashMap<>();
+    private final List<String> excludedMaterials;
+    private final List<Material> registeredMaterials = new ArrayList<>();
+    private final Map<String, String> blockToDropMap = new HashMap<>();
+
     private boolean isBlockRandomizerActive = true;
     private boolean isChestRandomizerActive = true;
-    private static final String configPath = "BLOCK_DROP_MAP";
 
-    public MaterialsManager(List<String> nonSurvivalMaterials, BlockRandomizer blockRandomizer) {
-        this.blockRandomizer = blockRandomizer;
-        this.nonSurvivalMaterials = nonSurvivalMaterials;
+    public MaterialsManager(ConfigManager configManager) {
+        this.excludedMaterials = configManager.loadExcludedMaterials();
+        configManager.loadConfigMap(blockToDropMap, ConfigPaths.BLOCK_DROP_MAP);
         registerMaterials();
     }
 
     public void registerMaterials() {
         for (Material material : Material.values()) {
-            if (material.isItem() && !nonSurvivalMaterials.contains(material.name())) {
-                materials.add(material);
+            if (material.isItem() && !excludedMaterials.contains(material.name())) {
+                registeredMaterials.add(material);
             }
         }
     }
 
-    public boolean loadBlockToDropMap() {
-        FileConfiguration config = blockRandomizer.getConfig();
-        ConfigurationSection section = config.getConfigurationSection(configPath);
-        if (section != null && !section.getKeys(false).isEmpty()) {
-            blockToDropMap.clear();
-            for (String key : section.getKeys(false)) {
-                blockToDropMap.put(key, (String) section.getValues(false).get(key));
-                config.get(configPath);
-            }
-            return true;
-        }
-        return false;
+    public void resetBlockToDropMap() {
+        blockToDropMap.clear();
     }
 
-    public void setBlockToDropMapConfig() {
-        blockRandomizer.getConfig().set(configPath, blockToDropMap);
-        blockRandomizer.saveConfig();
-    }
-
-    public List<Material> getMaterials() {
-        return materials;
+    public List<Material> getRegisteredMaterials() {
+        return registeredMaterials;
     }
 
     public Map<String, String> getBlockToDropMap() {
         return blockToDropMap;
-    }
-
-    public void setBlockToDropMap(Map<String, String> blockToDropMap) {
-        this.blockToDropMap = blockToDropMap;
     }
 
     public boolean getIsBlockRandomizerActive() {
