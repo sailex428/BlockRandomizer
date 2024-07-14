@@ -23,7 +23,8 @@ jobs:
       uses: actions/setup-java@v4.2.1
       with:
         java-version: 21
-        
+        distribution: 'adopt'
+
     - name: Gradle build
       run: gradle clean build
       
