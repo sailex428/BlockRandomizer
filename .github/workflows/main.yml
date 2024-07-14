@@ -44,7 +44,7 @@ jobs:
         javaVersion: ['21']
     
     steps:        
-      - uses: sailex428/minecraft-plugin-runtime-test@main
+      - uses: sailex428/minecraft-plugin-runtime-test@v1.1.3
         with:
           server-version: ${{ matrix.mcVersion }}
           java-version: ${{ matrix.javaVersion }}
