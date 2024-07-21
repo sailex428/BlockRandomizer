@@ -5,6 +5,7 @@ import me.sailex.blockrandomizer.config.ConfigManager;
 import me.sailex.blockrandomizer.gui.RandomizerInventory;
 import me.sailex.blockrandomizer.materials.MaterialsManager;
 
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 
 import org.bukkit.*;
@@ -43,6 +44,8 @@ public class InventoryClickListener implements Listener {
         handleChestRandomizer(currentItem);
         handleLoadConfig(currentItem, player);
         handleWorldReset(currentItem);
+
+        player.playSound(Sound.sound(org.bukkit.Sound.UI_BUTTON_CLICK, Sound.Source.PLAYER, 1.0f, 1.0f));
     }
 
     private void handleBlockRandomizer(ItemStack currentItem) {
